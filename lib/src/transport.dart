@@ -17,16 +17,19 @@ typedef Transport TransportBuilder({
 typedef Future<WebSocket> WebSocketBuilder();
 
 class TransportConfig {
-  TransportConfig(
-      {this.pingInterval = const Duration(seconds: 25),
-      this.headers = const <String, dynamic>{}});
+  TransportConfig({
+    this.pingInterval = const Duration(seconds: 25),
+    this.headers = const <String, dynamic>{},
+  });
 
   final Duration pingInterval;
   final Map<String, dynamic> headers;
 }
 
-Transport protobufTransportBuilder(
-    {@required String url, @required TransportConfig config}) {
+Transport protobufTransportBuilder({
+  @required String url,
+  @required TransportConfig config,
+}) {
   final replyDecoder = ProtobufReplyDecoder();
   final commandEncoder = ProtobufCommandEncoder();
 
@@ -50,18 +53,25 @@ abstract class GeneratedMessageSender {
 }
 
 class Transport implements GeneratedMessageSender {
-  Transport(this._socketBuilder, this._config, this._commandEncoder,
-      this._replyDecoder);
+  Transport(
+    this._socketBuilder,
+    this._config,
+    this._commandEncoder,
+    this._replyDecoder,
+  );
 
   final WebSocketBuilder _socketBuilder;
-  WebSocket _socket;
   final CommandEncoder _commandEncoder;
   final ReplyDecoder _replyDecoder;
   final TransportConfig _config;
 
-  Future open(void onPush(Push push),
-      {Function onError,
-      void onDone(String reason, bool shouldReconnect)}) async {
+  WebSocket _socket;
+
+  Future open(
+    void onPush(Push push), {
+    Function onError,
+    void onDone(String reason, bool shouldReconnect),
+  }) async {
     _socket = await _socketBuilder();
     if (_config.pingInterval != Duration.zero) {
       _socket.pingInterval = _config.pingInterval;
